@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valentine?</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(circle at top, #ffe3ee, #ffd2e2 55%, #ffc2d6);
+      overflow:hidden;
+    }
+
+    .card{
+      width:min(680px, 92vw);
+      padding:40px 24px;
+      text-align:center;
+      border-radius:22px;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.55);
+      position: relative;
+    }
+
+    h1{
+      margin:0 0 22px;
+      font-size: clamp(22px, 4vw, 38px);
+      color:#c0174b;
+      letter-spacing:0.2px;
+    }
+
+    /* area where NO moves */
+    .btn-row{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      align-items:center;
+      margin-top: 10px;
+      position: relative;
+      height: 90px; /* a bit taller for movement */
+    }
+
+    button{
+      border:0;
+      padding:14px 34px;
+      font-size:16px;
+      font-weight:700;
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+      transition: transform .12s ease;
+      user-select:none;
+      will-change: transform;
+    }
+    button:active{ transform: scale(0.96); }
+
+    #yes{
+      background:#2ecc71;
+      color:white;
+    }
+
+    #no{
+      background:#ff4d4d;
+      color:white;
+      position:absolute; /* important to move */
+      left: 55%;
+      top: 10px;
+    }
+
+    .result{
+      margin-top:18px;
+      font-size:18px;
+      font-weight:700;
+      color:#7a0b2c;
+      min-height: 26px;
+    }
+
+    .meme{
+      margin: 22px auto 0;
+      width: min(320px, 80%);
+      border-radius:18px;
+      overflow:hidden;
+      border: 3px solid #c0174b;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+      display:none;
+    }
+    .meme img{
+      width:100%;
+      display:block;
+    }
+
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1 id="title">Will you be my valentine? 🌹</h1>
+
+    <div class="btn-row" id="arena">
+      <button id="yes">Yes</button>
+      <button id="no">No</button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <div class="meme" id="memeBox">
+      <!-- Change image link here OR use local file like: cat.jpg -->
+      <img id="memeImg" src="aaa.jpg">
+    </div>
+  </div>
+
+  <script>
+    const noBtn   = document.getElementById("no");
+    const yesBtn  = document.getElementById("yes");
+    const arena   = document.getElementById("arena");
+    const result  = document.getElementById("result");
+    const title   = document.getElementById("title");
+    const memeBox = document.getElementById("memeBox");
+
+    let attempts = 0;
+    const maxAttemptsBeforeMeme = 6; // change this
+    let yesScale = 1;
+
+    function moveNoButton() {
+      attempts++;
+
+      // Move NO inside the arena
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect   = noBtn.getBoundingClientRect();
+      const padding   = 6;
+
+      const maxX = arenaRect.width  - btnRect.width  - padding;
+      const maxY = arenaRect.height - btnRect.height - padding;
+
+      const x = Math.random() * Math.max(0, maxX);
+      const y = Math.random() * Math.max(0, maxY);
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top  = `${y}px`;
+
+      // YES gets bigger every time NO escapes
+      yesScale += 0.15;
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      // Optional text change when it gets big
+      if (yesScale > 2.2) {
+        yesBtn.textContent = "نعم او yes";
+      }
+
+      // Show meme after some attempts
+      if (attempts >= maxAttemptsBeforeMeme) {
+        title.textContent = "لاتحاولييييش! 😾";
+        memeBox.style.display = "block";
+      }
+    }
+
+    // Escape on hover (hard to click)
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("mouseover", moveNoButton);
+
+    // Escape even if clicked
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // YES clicked
+    yesBtn.addEventListener("click", () => {
+      title.textContent = "يلومونا لمو احبك! 💖";
+      result.textContent = "هابيبي انتي 😌✨";
+      noBtn.classList.add("hidden");
+      memeBox.style.display = "none";
+      yesBtn.textContent = "✅ YES!";
+      yesBtn.style.transform = "scale(1.25)";
+    });
+
+    // Initial position
+    window.addEventListener("load", () => {
+      noBtn.style.left = "55%";
+      noBtn.style.top  = "10px";
+    });
+  </script>
+</body>
+</html>
